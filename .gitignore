@@ -1,0 +1,31 @@
+# 忽略构建目录及其子目录
+build/
+bin/
+
+# 忽略所有目录中的中间文件
+*.o
+*.obj
+
+# 忽略所有目录中的可执行文件
+*.exe
+*.out
+*.a
+*.so
+myschedule
+
+# 忽略所有目录中的临时文件
+*~
+*.swp
+*.tmp
+
+# 忽略所有目录中的日志文件
+*.log
+
+# 忽略 IDE 配置文件
+.vscode/
+.idea/
+*.code-workspace
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
