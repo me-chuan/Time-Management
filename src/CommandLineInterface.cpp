@@ -25,9 +25,13 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
     if (command == "addtask" && args.size() == 7) {
         int id = std::stoi(args[1]);
         taskManager.addTask(Task(id, args[2], args[3], args[4], args[5], args[6]));
+        taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
+        std::cout << "Task added and saved to file." << std::endl;
     } else if (command == "deltask" && args.size() == 2) {
         int id = std::stoi(args[1]);
         taskManager.deleteTask(id);
+        taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
+        std::cout << "Task deleted and saved to file." << std::endl;
     } else if (command == "showtask") {
         auto tasks = taskManager.getAllTasks(); // 获取所有任务
         for (const auto& task : tasks) {
@@ -38,9 +42,7 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
     } else if (command == "help") {
         showHelp();
     } else if (command == "exit") {
-        // 保存任务数据到文件
-        taskManager.saveToFile("../data/tasks.txt");
-        std::cout << "Tasks saved to file. Exiting..." << std::endl;
+        std::cout << "Exiting..." << std::endl;
         scheduler.stopReminderThread();
         exit(0);
     } else {
@@ -50,8 +52,11 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
 
 void CommandLineInterface::runShellMode() {
     // 加载任务数据
-    taskManager.loadFromFile("../data/tasks.txt");
-    std::cout << "Tasks loaded from file." << std::endl;
+    if (taskManager.loadFromFile("../data/tasks.txt")) {
+        std::cout << "Tasks loaded from file." << std::endl;
+    } else {
+        std::cerr << "Failed to load tasks from file. Please check the file format or path." << std::endl;
+    }
 
     std::string input;
     while (true) {

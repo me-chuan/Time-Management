@@ -45,11 +45,11 @@ void TaskManager::saveToFile(const std::string& filename) const {
     std::cout << "Tasks successfully saved to " << filename << std::endl;
 }
 
-void TaskManager::loadFromFile(const std::string& filename) {
+bool TaskManager::loadFromFile(const std::string& filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: Unable to open file for loading: " << filename << std::endl;
-        return;
+        return false;
     }
 
     std::string line;
@@ -69,4 +69,5 @@ void TaskManager::loadFromFile(const std::string& filename) {
 
     file.close();
     std::cout << "Tasks successfully loaded from " << filename << std::endl;
+    return true;
 }
