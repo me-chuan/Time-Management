@@ -29,3 +29,17 @@ myschedule
 # 忽略操作系统生成的文件
 .DS_Store
 Thumbs.db
+
+# 忽略 CMake 生成的构建目录
+/tests/CMakeFiles/
+/tests/CMakeCache.txt
+/tests/Makefile
+/tests/test_project
+/tests/cmake_install.cmake
+
+# 忽略其他生成的文件
+/tests/*.o
+/tests/*.obj
+/tests/*.exe
+/tests/*.out
+/tests/*.log
