@@ -27,3 +27,9 @@ std::time_t stringToTimeT(const std::string& timeStr, const std::string& format)
     ss >> std::get_time(&tm, format.c_str());
     return std::mktime(&tm);
 }
+
+bool isValidTimeFormat(const std::string& timeStr) {
+    // 使用正则表达式验证时间格式
+    std::regex timeRegex(R"(\d{4}-\d{2}-\d{2}_\d{2}:\d{2})");
+    return std::regex_match(timeStr, timeRegex);
+}

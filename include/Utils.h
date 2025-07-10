@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ctime>
+#include <regex>
 
 // 将时间字符串转换为 std::tm
 std::tm stringToTime(const std::string& timeStr);
@@ -13,5 +14,7 @@ std::time_t tmToTimeT(const std::tm& tm);
 std::string timeTToString(std::time_t timeT, const std::string& format);
 
 std::time_t stringToTimeT(const std::string& timeStr, const std::string& format);
+
+bool isValidTimeFormat(const std::string& timeStr);
 
 #endif // UTILS_H

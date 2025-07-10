@@ -8,13 +8,13 @@ CommandLineInterface::CommandLineInterface(TaskManager& taskManager, Scheduler& 
 
 void CommandLineInterface::showHelp() const {
     std::cout << "Available commands:\n"
-              << "  addtask <id> <name> <start_time> <reminder_time> [category] [priority]\n"
+              << "  addtask <id> <name> <start_time> <reminder_time> [-c <category>] [-p <priority>]\n"
               << "    - id: Task ID (positive integer)\n"
               << "    - name: Task name (non-empty string)\n"
               << "    - start_time: Task start time (format: YYYY-MM-DD_HH:MM)\n"
               << "    - reminder_time: Task reminder time (format: YYYY-MM-DD_HH:MM)\n"
-              << "    - category: Optional task category (default: 未分类)\n"
-              << "    - priority: Optional task priority (default: 中)\n"
+              << "    - -c <category>: Optional task category (default: 未分类)\n"
+              << "    - -p <priority>: Optional task priority (default: 中)\n"
               << "  deltask <id>\n"
               << "    - id: Task ID to delete\n"
               << "  showtask\n"
@@ -48,12 +48,12 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
             }
 
             const std::string& start_time = args[3];
-            if (stringToTime(start_time).tm_year == 0) {
+            if (!isValidTimeFormat(start_time)) {
                 throw std::invalid_argument("Invalid start time format. Expected format: YYYY-MM-DD_HH:MM.");
             }
 
             const std::string& reminder_time = args[4];
-            if (stringToTime(reminder_time).tm_year == 0) {
+            if (!isValidTimeFormat(reminder_time)) {
                 throw std::invalid_argument("Invalid reminder time format. Expected format: YYYY-MM-DD_HH:MM.");
             }
 
@@ -61,12 +61,17 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
             std::string category = "未分类";
             std::string priority = "中";
 
-            // 如果提供了可选参数，覆盖默认值
-            if (args.size() > 5) {
-                category = args[5];
-            }
-            if (args.size() > 6) {
-                priority = args[6];
+            // 解析可选参数
+            for (size_t i = 5; i < args.size(); ++i) {
+                if (args[i] == "-c" && i + 1 < args.size()) {
+                    category = args[i + 1];
+                    ++i; // 跳过参数值
+                } else if (args[i] == "-p" && i + 1 < args.size()) {
+                    priority = args[i + 1];
+                    ++i; // 跳过参数值
+                } else {
+                    throw std::invalid_argument("Unknown or incomplete parameter: " + args[i]);
+                }
             }
 
             // 添加任务
