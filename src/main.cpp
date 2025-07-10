@@ -7,9 +7,6 @@ int main() {
     // 创建 TaskManager 实例
     TaskManager taskManager;
 
-    // 加载任务数据
-    taskManager.loadFromFile("../data/tasks.txt");
-
     // 创建 Scheduler 实例
     Scheduler scheduler(taskManager);
 
@@ -22,9 +19,6 @@ int main() {
 
     // 进入命令行交互模式
     cli.runShellMode();
-
-    // 保存任务数据
-    taskManager.saveToFile("../data/tasks.txt");
 
     return 0;
 }

@@ -9,9 +9,10 @@ void CommandLineInterface::showHelp() const {
     std::cout << "Available commands:\n"
               << "  addtask <id> <name> <start_time> <category> <priority> <reminder_time>\n"
               << "  deltask <id>\n"
-              << "  showtask <date>\n"
+              << "  showtask\n"
               << "  run\n"
-              << "  help\n";
+              << "  help\n"
+              << "  exit\n";
 }
 
 void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
@@ -27,8 +28,8 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
     } else if (command == "deltask" && args.size() == 2) {
         int id = std::stoi(args[1]);
         taskManager.deleteTask(id);
-    } else if (command == "showtask" && args.size() == 2) {
-        auto tasks = taskManager.getTasksByDate(args[1]);
+    } else if (command == "showtask") {
+        auto tasks = taskManager.getAllTasks(); // 获取所有任务
         for (const auto& task : tasks) {
             std::cout << task.toString() << std::endl;
         }
@@ -36,12 +37,22 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
         scheduler.startReminderThread();
     } else if (command == "help") {
         showHelp();
+    } else if (command == "exit") {
+        // 保存任务数据到文件
+        taskManager.saveToFile("../data/tasks.txt");
+        std::cout << "Tasks saved to file. Exiting..." << std::endl;
+        scheduler.stopReminderThread();
+        exit(0);
     } else {
         std::cout << "Unknown command. Type 'help' for available commands." << std::endl;
     }
 }
 
 void CommandLineInterface::runShellMode() {
+    // 加载任务数据
+    taskManager.loadFromFile("../data/tasks.txt");
+    std::cout << "Tasks loaded from file." << std::endl;
+
     std::string input;
     while (true) {
         std::cout << "> ";

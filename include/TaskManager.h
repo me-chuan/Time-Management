@@ -10,6 +10,7 @@ public:
     void addTask(const Task& task);
     void deleteTask(int id);
     std::vector<Task> getTasksByDate(const std::string& date) const;
+    std::vector<Task> getAllTasks() const; // 新增方法
     void saveToFile(const std::string& filename) const;
     void loadFromFile(const std::string& filename);
 

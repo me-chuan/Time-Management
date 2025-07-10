@@ -26,6 +26,10 @@ std::vector<Task> TaskManager::getTasksByDate(const std::string& date) const {
     return result;
 }
 
+std::vector<Task> TaskManager::getAllTasks() const {
+    return tasks; // 返回所有任务
+}
+
 void TaskManager::saveToFile(const std::string& filename) const {
     std::ofstream file(filename);
     if (!file.is_open()) {
