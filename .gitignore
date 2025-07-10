@@ -43,3 +43,6 @@ Thumbs.db
 /tests/*.exe
 /tests/*.out
 /tests/*.log
+
+# 忽略data文件夹
+data/
