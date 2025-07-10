@@ -15,6 +15,7 @@ public:
     int getId() const;
     std::string getName() const;
     std::string getStartTime() const;
+    std::string getReminderTime() const;
 
 private:
     int id;

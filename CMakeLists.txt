@@ -19,6 +19,7 @@ set(SOURCES
     src/TaskManager.cpp
     src/Scheduler.cpp
     src/CommandLineInterface.cpp
+    src/Utils.cpp
 )
 
 # 添加可执行文件

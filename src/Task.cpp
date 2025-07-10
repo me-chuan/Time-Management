@@ -31,3 +31,7 @@ std::string Task::getName() const {
 std::string Task::getStartTime() const {
     return start_time;
 }
+
+std::string Task::getReminderTime() const {
+    return reminder_time;
+}
