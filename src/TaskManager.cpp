@@ -14,6 +14,7 @@ void TaskManager::deleteTask(int id) {
             return; // 删除后直接退出，避免迭代器失效
         }
     }
+    std::cerr << "Error: Task with ID " << id << " not found." << std::endl;
 }
 
 std::vector<Task> TaskManager::getTasksByDate(const std::string& date) const {
@@ -54,17 +55,34 @@ bool TaskManager::loadFromFile(const std::string& filename) {
 
     std::string line;
     while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        int id;
-        std::string name, start_time, category, priority, reminder_time;
+        // 使用分隔符解析任务数据
+        size_t id_pos = line.find("ID: ");
+        size_t name_pos = line.find(", Name: ");
+        size_t start_time_pos = line.find(", Start Time: ");
+        size_t category_pos = line.find(", Category: ");
+        size_t priority_pos = line.find(", Priority: ");
+        size_t reminder_time_pos = line.find(", Reminder Time: ");
 
-        // 检查是否能够正确解析任务数据
-        if (!(iss >> id >> name >> start_time >> category >> priority >> reminder_time)) {
+        if (id_pos == std::string::npos || name_pos == std::string::npos ||
+            start_time_pos == std::string::npos || category_pos == std::string::npos ||
+            priority_pos == std::string::npos || reminder_time_pos == std::string::npos) {
             std::cerr << "Error: Malformed task data in file: " << line << std::endl;
             continue; // 跳过错误数据
         }
 
-        tasks.emplace_back(id, name, start_time, category, priority, reminder_time);
+        try {
+            int id = std::stoi(line.substr(id_pos + 4, name_pos - (id_pos + 4)));
+            std::string name = line.substr(name_pos + 8, start_time_pos - (name_pos + 8));
+            std::string start_time = line.substr(start_time_pos + 13, category_pos - (start_time_pos + 13));
+            std::string category = line.substr(category_pos + 11, priority_pos - (category_pos + 11));
+            std::string priority = line.substr(priority_pos + 11, reminder_time_pos - (priority_pos + 11));
+            std::string reminder_time = line.substr(reminder_time_pos + 15);
+
+            tasks.emplace_back(id, name, start_time, category, priority, reminder_time);
+        } catch (const std::exception& e) {
+            std::cerr << "Error: Failed to parse task data in file: " << line << std::endl;
+            continue; // 跳过错误数据
+        }
     }
 
     file.close();
