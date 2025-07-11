@@ -31,5 +31,25 @@ std::time_t stringToTimeT(const std::string& timeStr, const std::string& format)
 bool isValidTimeFormat(const std::string& timeStr) {
     // 使用正则表达式验证时间格式
     std::regex timeRegex(R"(\d{4}-\d{2}-\d{2}_\d{2}:\d{2})");
-    return std::regex_match(timeStr, timeRegex);
+    if (!std::regex_match(timeStr, timeRegex)) {
+        return false; // 格式不匹配
+    }
+
+    // 进一步解析时间字符串并检查值范围
+    std::tm tm = {};
+    std::istringstream ss(timeStr);
+    ss >> std::get_time(&tm, "%Y-%m-%d_%H:%M");
+    if (ss.fail()) {
+        return false; // 解析失败
+    }
+
+    // 检查时间值范围
+    if (tm.tm_year < 0 || tm.tm_mon < 0 || tm.tm_mon > 11 || // 月份范围：0-11
+        tm.tm_mday < 1 || tm.tm_mday > 31 ||                // 日期范围：1-31
+        tm.tm_hour < 0 || tm.tm_hour > 23 ||                // 小时范围：0-23
+        tm.tm_min < 0 || tm.tm_min > 59) {                  // 分钟范围：0-59
+        return false; // 时间值超出范围
+    }
+
+    return true; // 时间格式和范围均有效
 }

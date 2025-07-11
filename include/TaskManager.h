@@ -13,6 +13,7 @@ public:
     std::vector<Task> getAllTasks() const; // 新增方法
     void saveToFile(const std::string& filename) const;
     bool loadFromFile(const std::string& filename);
+    int getMaxTaskId() const; // 新增方法
 
 private:
     std::vector<Task> tasks;

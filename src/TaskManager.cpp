@@ -89,3 +89,13 @@ bool TaskManager::loadFromFile(const std::string& filename) {
     std::cout << "Tasks successfully loaded from " << filename << std::endl;
     return true;
 }
+
+int TaskManager::getMaxTaskId() const {
+    int maxId = 0;
+    for (const auto& task : tasks) {
+        if (task.getId() > maxId) {
+            maxId = task.getId();
+        }
+    }
+    return maxId;
+}

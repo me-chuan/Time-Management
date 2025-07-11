@@ -16,6 +16,7 @@ public:
 private:
     TaskManager& taskManager;
     Scheduler& scheduler;
+    int nextId; // 将 nextId 定义为类的成员变量
 };
 
 #endif // COMMANDLINEINTERFACE_H

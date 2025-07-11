@@ -8,8 +8,7 @@ CommandLineInterface::CommandLineInterface(TaskManager& taskManager, Scheduler& 
 
 void CommandLineInterface::showHelp() const {
     std::cout << "Available commands:\n"
-              << "  addtask <id> <name> <start_time> <reminder_time> [-c <category>] [-p <priority>]\n"
-              << "    - id: Task ID (positive integer)\n"
+              << "  addtask <name> <start_time> <reminder_time> [-c <category>] [-p <priority>]\n"
               << "    - name: Task name (non-empty string)\n"
               << "    - start_time: Task start time (format: YYYY-MM-DD_HH:MM)\n"
               << "    - reminder_time: Task reminder time (format: YYYY-MM-DD_HH:MM)\n"
@@ -28,31 +27,29 @@ void CommandLineInterface::showHelp() const {
 }
 
 void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
+
     if (args.empty()) {
         std::cout << "No command provided. Type 'help' for available commands." << std::endl;
         return;
     }
 
     const std::string& command = args[0];
-    if (command == "addtask" && args.size() >= 5) { // 至少需要5个参数
+    if (command == "addtask" && args.size() >= 4) { // 至少需要4个参数
         try {
-            // 检验参数合法性
-            int id = std::stoi(args[1]);
-            if (id <= 0) {
-                throw std::invalid_argument("Task ID must be a positive integer.");
-            }
+            // 自动生成任务 ID
+            int id = nextId++;
 
-            const std::string& name = args[2];
+            const std::string& name = args[1];
             if (name.empty()) {
                 throw std::invalid_argument("Task name cannot be empty.");
             }
 
-            const std::string& start_time = args[3];
+            const std::string& start_time = args[2];
             if (!isValidTimeFormat(start_time)) {
                 throw std::invalid_argument("Invalid start time format. Expected format: YYYY-MM-DD_HH:MM.");
             }
 
-            const std::string& reminder_time = args[4];
+            const std::string& reminder_time = args[3];
             if (!isValidTimeFormat(reminder_time)) {
                 throw std::invalid_argument("Invalid reminder time format. Expected format: YYYY-MM-DD_HH:MM.");
             }
@@ -62,7 +59,7 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
             std::string priority = "中";
 
             // 解析可选参数
-            for (size_t i = 5; i < args.size(); ++i) {
+            for (size_t i = 4; i < args.size(); ++i) {
                 if (args[i] == "-c" && i + 1 < args.size()) {
                     category = args[i + 1];
                     ++i; // 跳过参数值
@@ -77,15 +74,24 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
             // 添加任务
             taskManager.addTask(Task(id, name, start_time, category, priority, reminder_time));
             taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
-            std::cout << "Task added and saved to file." << std::endl;
+            std::cout << "Task added with ID " << id << " and saved to file." << std::endl;
         } catch (const std::exception& e) {
             std::cerr << "Error adding task: " << e.what() << std::endl;
         }
     } else if (command == "deltask" && args.size() == 2) {
-        int id = std::stoi(args[1]);
-        taskManager.deleteTask(id);
-        taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
-        std::cout << "Task deleted and saved to file." << std::endl;
+        try {
+            int id = std::stoi(args[1]);
+            taskManager.deleteTask(id);
+            taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
+            std::cout << "Task with ID " << id << " deleted and saved to file." << std::endl;
+
+            // 如果删除的是最后一个任务，调整 nextId
+            if (id == nextId - 1) {
+                --nextId;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error deleting task: " << e.what() << std::endl;
+        }
     } else if (command == "showtask") {
         auto tasks = taskManager.getAllTasks(); // 获取所有任务
         for (const auto& task : tasks) {
@@ -108,6 +114,11 @@ void CommandLineInterface::runShellMode() {
     // 加载任务数据
     if (taskManager.loadFromFile("../data/tasks.txt")) {
         std::cout << "Tasks loaded from file." << std::endl;
+
+        // 动态设置 nextId 为当前任务列表中的最大 ID + 1
+        int maxId = taskManager.getMaxTaskId();
+        nextId = maxId;
+        //std::cout << "Next task ID set to " << nextId << "." << std::endl;
     } else {
         std::cerr << "Failed to load tasks from file. Please check the file format or path." << std::endl;
     }
