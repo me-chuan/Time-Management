@@ -44,5 +44,6 @@ Thumbs.db
 /tests/*.out
 /tests/*.log
 
-# 忽略data文件夹
+# 忽略data, audio文件夹
 data/
+audio/
