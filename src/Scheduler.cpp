@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <cstdlib>
 
 Scheduler::Scheduler(TaskManager& taskManager)
     : taskManager(taskManager), running(false) {}
@@ -40,6 +41,9 @@ void Scheduler::checkReminders() {
             // 检查提醒时间是否在当前时间的前后 30 秒内
             if (std::abs(difftime(reminder_time, now_time)) <= 30) {
                 std::cout << "Reminder: " << task.toString() << std::endl;
+
+            // 播放录音文件
+            //std::system("aplay ../audio/reminder.wav"); // 替换为音频文件路径
             }
         }
 
