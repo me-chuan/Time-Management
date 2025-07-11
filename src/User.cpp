@@ -30,3 +30,7 @@ std::string User::hashPassword(const std::string& password) const {
     }
     return oss.str();
 }
+
+std::string User::getPasswordHash() const {
+    return password_hash;
+}
