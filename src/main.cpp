@@ -23,29 +23,28 @@ void saveUsersToFile(const std::map<std::string, User>& users) {
     file.close();
 }
 
-// 从文件加载用户数据
 std::map<std::string, User> loadUsersFromFile() {
     std::map<std::string, User> users;
     std::ifstream file(USER_FILE);
     if (!file.is_open()) {
         std::cerr << "Error: Unable to open user file for loading!" << std::endl;
-        // 如果文件不存在，返回一个空的用户列表
         return users;
     }
 
     std::string username, passwordHash;
     while (file >> username >> passwordHash) {
-        users[username] = User(username, passwordHash); // 使用特殊构造函数加载用户
+        // 使用特殊构造函数加载用户，直接保存哈希值
+        users[username] = User(username, passwordHash, true); // 第三个参数表示密码已经是哈希值
     }
 
     file.close();
+    //std::cout << "Total users loaded: " << users.size() << std::endl;
     return users;
 }
 
 int main() {
     // 用户管理
     std::map<std::string, User> users = loadUsersFromFile();
-
     std::cout << "Welcome to the Schedule Management System!" << std::endl;
 
     while (true) {
@@ -86,13 +85,6 @@ int main() {
 
                 // 创建 CommandLineInterface 实例
                 CommandLineInterface cli(taskManager, scheduler);
-
-                // 加载任务数据
-                if (taskManager.loadFromFile("../data/tasks.txt")) {
-                    std::cout << "Tasks loaded from file." << std::endl;
-                } else {
-                    std::cerr << "Failed to load tasks from file. Please check the file format or path." << std::endl;
-                }
 
                 // 进入命令行交互模式
                 cli.runShellMode();

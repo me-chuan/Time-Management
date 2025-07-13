@@ -5,8 +5,9 @@
 
 class User {
 public:
-    User() = default; // 默认构造函数
-    User(const std::string& username, const std::string& password);
+    User(); // 默认构造函数
+    User(const std::string& username, const std::string& password); // 用于注册时
+    User(const std::string& username, const std::string& passwordHash, bool isHashed); // 用于加载哈希值
 
     bool authenticate(const std::string& username, const std::string& password) const;
     void setPassword(const std::string& password);
