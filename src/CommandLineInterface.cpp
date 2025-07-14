@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include  "Utils.h"
+#include <QApplication>
+#include "AddTaskDialog.h"
 
 CommandLineInterface::CommandLineInterface(TaskManager& taskManager, Scheduler& scheduler)
     : taskManager(taskManager), scheduler(scheduler) {}
@@ -27,73 +29,69 @@ void CommandLineInterface::showHelp() const {
 }
 
 void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
-
     if (args.empty()) {
         std::cout << "No command provided. Type 'help' for available commands." << std::endl;
         return;
     }
 
     const std::string& command = args[0];
-    if (command == "addtask" && args.size() >= 4) { // 至少需要4个参数
-        try {
-            // 自动生成任务 ID
-            int id = nextId++;
+    if (command == "addtask") {
+        // 创建并显示图形界面对话框
+        AddTaskDialog dialog;
+        if (dialog.exec() == QDialog::Accepted) {
+            std::string name = dialog.getTaskName();
+            std::string start_time = dialog.getStartTime();
+            std::string reminder_time = dialog.getReminderTime();
+            std::string category = dialog.getCategory();
+            std::string priority = dialog.getPriority();
 
-            const std::string& name = args[1];
-            if (name.empty()) {
-                throw std::invalid_argument("Task name cannot be empty.");
+            // 如果用户没有输入分类或优先级，使用默认值
+            if (category.empty()) {
+                category = "未分类";
+            }
+            if (priority.empty()) {
+                priority = "中";
             }
 
-            const std::string& start_time = args[2];
-            if (!isValidTimeFormat(start_time)) {
-                throw std::invalid_argument("Invalid start time format. Expected format: YYYY-MM-DD_HH:MM.");
-            }
-
-            const std::string& reminder_time = args[3];
-            if (!isValidTimeFormat(reminder_time)) {
-                throw std::invalid_argument("Invalid reminder time format. Expected format: YYYY-MM-DD_HH:MM.");
-            }
-
-            // 设置默认值
-            std::string category = "未分类";
-            std::string priority = "中";
-
-            // 解析可选参数
-            for (size_t i = 4; i < args.size(); ++i) {
-                if (args[i] == "-c" && i + 1 < args.size()) {
-                    category = args[i + 1];
-                    ++i; // 跳过参数值
-                } else if (args[i] == "-p" && i + 1 < args.size()) {
-                    priority = args[i + 1];
-                    ++i; // 跳过参数值
-                } else {
-                    throw std::invalid_argument("Unknown or incomplete parameter: " + args[i]);
+            try {
+                if (name.empty()) {
+                    throw std::invalid_argument("Task name cannot be empty.");
                 }
-            }
+                if (!isValidTimeFormat(start_time)) {
+                    throw std::invalid_argument("Invalid start time format. Expected format: YYYY-MM-DD_HH:MM.");
+                }
+                if (!isValidTimeFormat(reminder_time)) {
+                    throw std::invalid_argument("Invalid reminder time format. Expected format: YYYY-MM-DD_HH:MM.");
+                }
 
-            // 添加任务
-            taskManager.addTask(Task(id, name, start_time, category, priority, reminder_time));
-            taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
-            std::cout << "Task added with ID " << id << " and saved to file." << std::endl;
-        } catch (const std::exception& e) {
-            std::cerr << "Error adding task: " << e.what() << std::endl;
+                // 自动生成任务 ID 并添加任务
+                int id = ++nextId;
+                taskManager.addTask(Task(id, name, start_time, category, priority, reminder_time));
+                taskManager.saveToFile("../data/tasks.txt");
+                std::cout << "Task added with ID " << id << " and saved to file." << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Error adding task: " << e.what() << std::endl;
+            }
+        } else {
+            std::cout << "Task creation cancelled." << std::endl;
         }
     } else if (command == "deltask" && args.size() == 2) {
+        // 保留原有的 deltask 逻辑
         try {
             int id = std::stoi(args[1]);
             taskManager.deleteTask(id);
-            taskManager.saveToFile("../data/tasks.txt"); // 保存任务数据到文件
+            taskManager.saveToFile("../data/tasks.txt");
             std::cout << "Task with ID " << id << " deleted and saved to file." << std::endl;
 
             // 如果删除的是最后一个任务，调整 nextId
-            if (id == nextId - 1) {
+            if (id == nextId) {
                 --nextId;
             }
         } catch (const std::exception& e) {
             std::cerr << "Error deleting task: " << e.what() << std::endl;
         }
     } else if (command == "showtask") {
-        auto tasks = taskManager.getAllTasks(); // 获取所有任务
+        auto tasks = taskManager.getAllTasks();
         for (const auto& task : tasks) {
             std::cout << task.toString() << std::endl;
         }
