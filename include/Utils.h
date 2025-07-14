@@ -17,4 +17,6 @@ std::time_t stringToTimeT(const std::string& timeStr, const std::string& format)
 
 bool isValidTimeFormat(const std::string& timeStr);
 
+std::string trim(const std::string& str);
+
 #endif // UTILS_H

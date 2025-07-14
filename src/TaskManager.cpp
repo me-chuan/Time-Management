@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "Utils.h"
 
 void TaskManager::addTask(const Task& task) {
     tasks.push_back(task);
@@ -53,8 +54,14 @@ bool TaskManager::loadFromFile(const std::string& filename) {
         return false;
     }
 
+    tasks.clear(); // 清空现有任务
     std::string line;
     while (std::getline(file, line)) {
+        // 跳过空行
+        if (line.empty()) {
+            continue;
+        }
+
         // 使用分隔符解析任务数据
         size_t id_pos = line.find("ID: ");
         size_t name_pos = line.find(", Name: ");
@@ -71,12 +78,25 @@ bool TaskManager::loadFromFile(const std::string& filename) {
         }
 
         try {
+            // 正确计算字符串提取的起始位置和长度
             int id = std::stoi(line.substr(id_pos + 4, name_pos - (id_pos + 4)));
+            
             std::string name = line.substr(name_pos + 8, start_time_pos - (name_pos + 8));
-            std::string start_time = line.substr(start_time_pos + 13, category_pos - (start_time_pos + 13));
-            std::string category = line.substr(category_pos + 11, priority_pos - (category_pos + 11));
-            std::string priority = line.substr(priority_pos + 11, reminder_time_pos - (priority_pos + 11));
-            std::string reminder_time = line.substr(reminder_time_pos + 15);
+            
+            std::string start_time = line.substr(start_time_pos + 14, category_pos - (start_time_pos + 14));
+            
+            std::string category = line.substr(category_pos + 12, priority_pos - (category_pos + 12));
+            
+            std::string priority = line.substr(priority_pos + 12, reminder_time_pos - (priority_pos + 12));
+            
+            std::string reminder_time = line.substr(reminder_time_pos + 17);
+
+            // 去除字符串前后的空格
+            name = trim(name);
+            start_time = trim(start_time);
+            category = trim(category);
+            priority = trim(priority);
+            reminder_time = trim(reminder_time);
 
             tasks.emplace_back(id, name, start_time, category, priority, reminder_time);
         } catch (const std::exception& e) {
@@ -87,7 +107,7 @@ bool TaskManager::loadFromFile(const std::string& filename) {
 
     file.close();
     std::cout << "Tasks successfully loaded from " << filename << std::endl;
-    return true;
+    return true; // 添加这个return语句
 }
 
 int TaskManager::getMaxTaskId() const {
