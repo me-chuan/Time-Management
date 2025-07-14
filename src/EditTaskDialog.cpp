@@ -10,7 +10,7 @@
 
 EditTaskDialog::EditTaskDialog(const Task& task, QWidget* parent)
     : QDialog(parent) {
-    setWindowTitle(QString::fromUtf8("编辑任务"));
+    setWindowTitle(QString::fromUtf8("Edit Task"));
     setModal(true);
     
     // 设置窗口大小
@@ -69,7 +69,7 @@ EditTaskDialog::EditTaskDialog(const Task& task, QWidget* parent)
     layout->addWidget(new QLabel(QString::fromUtf8("优先级:"), this));
     priorityInput = new QLineEdit(this);
     priorityInput->setText(QString::fromUtf8(task.getPriority().c_str()));
-    priorityInput->setPlaceholderText(QString::fromUtf8("高, 中, 低"));
+    priorityInput->setPlaceholderText(QString::fromUtf8("High, Middle, Low"));
     layout->addWidget(priorityInput);
 
     // Done status

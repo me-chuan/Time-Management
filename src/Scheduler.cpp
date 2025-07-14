@@ -33,6 +33,11 @@ void Scheduler::checkReminders() {
         // 遍历所有任务，检查是否需要提醒
         auto tasks = taskManager.getAllTasks();
         for (const auto& task : tasks) {
+            // 跳过已完成的任务
+            if (task.isDone()) {
+                continue;
+            }
+
             std::tm reminder_tm = stringToTime(task.getReminderTime());
             std::time_t reminder_time = tmToTimeT(reminder_tm);
 
@@ -42,12 +47,12 @@ void Scheduler::checkReminders() {
             if (std::abs(difftime(reminder_time, now_time)) <= 30) {
                 std::cout << "Reminder: " << task.toString() << std::endl;
 
-            // 播放录音文件
-            //std::system("aplay ../audio/reminder.wav"); // 替换为音频文件路径
+                // 播放录音文件
+                //std::system("aplay ../audio/reminder.wav"); // 替换为音频文件路径
             }
         }
 
         // 每分钟检查一次
         std::this_thread::sleep_for(std::chrono::seconds(30));
-}
+    }
 }

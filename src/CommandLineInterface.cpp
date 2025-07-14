@@ -109,10 +109,10 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
 
                     // 如果用户没有输入分类或优先级，使用默认值
                     if (category.empty()) {
-                        category = "未分类";
+                        category = "None";
                     }
                     if (priority.empty()) {
-                        priority = "中";
+                        priority = "Middle";
                     }
 
                     try {
