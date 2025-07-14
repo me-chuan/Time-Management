@@ -6,6 +6,7 @@
 
 class QLineEdit;
 class QPushButton;
+class QDateTimeEdit;
 
 class AddTaskDialog : public QDialog {
     Q_OBJECT
@@ -26,8 +27,8 @@ private slots:
 
 private:
     QLineEdit* taskNameInput;
-    QLineEdit* startTimeInput;
-    QLineEdit* reminderTimeInput;
+    QDateTimeEdit* startTimeInput;
+    QDateTimeEdit* reminderTimeInput;
     QLineEdit* categoryInput;
     QLineEdit* priorityInput;
     QPushButton* submitButton;

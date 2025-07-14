@@ -4,48 +4,59 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QDateTimeEdit>
+#include <QDateTime>
+#include <QComboBox>
+#include <QTextCodec>
 
 AddTaskDialog::AddTaskDialog(QWidget* parent)
     : QDialog(parent) {
-    setWindowTitle("Add New Task");
+    setWindowTitle(QString("Add New Task")); 
     setModal(true);
+    
+    // 设置窗口大小
+    setFixedSize(600, 450);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
 
     // Task Name
-    layout->addWidget(new QLabel("Task Name:", this));
+    layout->addWidget(new QLabel(QString::fromUtf8("任务名称:"), this));
     taskNameInput = new QLineEdit(this);
-    taskNameInput->setPlaceholderText("Enter task name");
+    taskNameInput->setPlaceholderText(QString::fromUtf8("请输入任务名称"));
     layout->addWidget(taskNameInput);
 
     // Start Time
-    layout->addWidget(new QLabel("Start Time (YYYY-MM-DD_HH:MM):", this));
-    startTimeInput = new QLineEdit(this);
-    startTimeInput->setPlaceholderText("2025-07-15_10:00");
+    layout->addWidget(new QLabel(QString::fromUtf8("开始时间:"), this));
+    startTimeInput = new QDateTimeEdit(this);
+    startTimeInput->setDisplayFormat("yyyy-MM-dd hh:mm");
+    startTimeInput->setDateTime(QDateTime::currentDateTime());
+    startTimeInput->setCalendarPopup(true);
     layout->addWidget(startTimeInput);
 
     // Reminder Time
-    layout->addWidget(new QLabel("Reminder Time (YYYY-MM-DD_HH:MM):", this));
-    reminderTimeInput = new QLineEdit(this);
-    reminderTimeInput->setPlaceholderText("2025-07-15_09:50");
+    layout->addWidget(new QLabel(QString::fromUtf8("提醒时间:"), this));
+    reminderTimeInput = new QDateTimeEdit(this);
+    reminderTimeInput->setDisplayFormat("yyyy-MM-dd hh:mm");
+    reminderTimeInput->setDateTime(QDateTime::currentDateTime().addSecs(-600));
+    reminderTimeInput->setCalendarPopup(true);
     layout->addWidget(reminderTimeInput);
 
     // Category
-    layout->addWidget(new QLabel("Category (Optional, default: 未分类):", this));
+    layout->addWidget(new QLabel(QString::fromUtf8("分类 (可选, 默认: 未分类):"), this));
     categoryInput = new QLineEdit(this);
-    categoryInput->setPlaceholderText("学习, 工作, 生活, etc.");
+    categoryInput->setPlaceholderText(QString::fromUtf8("学习, 工作, 生活, 健康, 娱乐"));
     layout->addWidget(categoryInput);
 
     // Priority
-    layout->addWidget(new QLabel("Priority (Optional, default: 中):", this));
+    layout->addWidget(new QLabel(QString::fromUtf8("优先级 (可选, 默认: 中):"), this));
     priorityInput = new QLineEdit(this);
-    priorityInput->setPlaceholderText("高, 中, 低");
+    priorityInput->setPlaceholderText(QString::fromUtf8("高, 中, 低"));
     layout->addWidget(priorityInput);
 
     // Buttons
     QHBoxLayout* buttonLayout = new QHBoxLayout();
-    submitButton = new QPushButton("Add Task", this);
-    cancelButton = new QPushButton("Cancel", this);
+    submitButton = new QPushButton(QString::fromUtf8("添加任务"), this);
+    cancelButton = new QPushButton(QString::fromUtf8("取消"), this);
     
     buttonLayout->addWidget(submitButton);
     buttonLayout->addWidget(cancelButton);
@@ -56,16 +67,23 @@ AddTaskDialog::AddTaskDialog(QWidget* parent)
 }
 
 void AddTaskDialog::handleSubmit() {
-    taskName = taskNameInput->text().toStdString();
-    startTime = startTimeInput->text().toStdString();
-    reminderTime = reminderTimeInput->text().toStdString();
-    category = categoryInput->text().toStdString();
-    priority = priorityInput->text().toStdString();
-    accept(); // 关闭对话框并返回 Accepted
+    taskName = taskNameInput->text().toUtf8().toStdString();
+    
+    // 将 QDateTime 转换为你需要的格式
+    QDateTime startDT = startTimeInput->dateTime();
+    QDateTime reminderDT = reminderTimeInput->dateTime();
+    
+    startTime = startDT.toString("yyyy-MM-dd_hh:mm").toStdString();
+    reminderTime = reminderDT.toString("yyyy-MM-dd_hh:mm").toStdString();
+    
+    category = categoryInput->text().toUtf8().toStdString();
+    priority = priorityInput->text().toUtf8().toStdString();
+    
+    accept();
 }
 
 void AddTaskDialog::handleCancel() {
-    reject(); // 关闭对话框并返回 Rejected
+    reject();
 }
 
 std::string AddTaskDialog::getTaskName() const {

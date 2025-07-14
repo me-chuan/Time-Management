@@ -6,6 +6,8 @@
 #include <map>
 #include <fstream>
 #include <QApplication>  // 添加Qt应用程序支持
+#include <QTextCodec>  // 添加这个头文件
+#include <QFont>  // 添加这个头文件来支持QFont
 
 const std::string USER_FILE = "../data/users.txt";
 
@@ -46,7 +48,16 @@ std::map<std::string, User> loadUsersFromFile() {
 int main(int argc, char* argv[]) {  // 修改main函数签名以支持Qt
     // 初始化Qt应用程序
     QApplication app(argc, argv);
+
+    // 设置字符编码 - 关键步骤
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     
+    // 设置应用程序字体以支持中文
+    QFont font;
+    font.setFamily("SimHei");  // 使用黑体
+    font.setPointSize(10);
+    app.setFont(font);
+
     // 用户管理
     std::map<std::string, User> users = loadUsersFromFile();
     std::cout << "Welcome to the Schedule Management System!" << std::endl;
