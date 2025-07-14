@@ -9,13 +9,48 @@ void TaskManager::addTask(const Task& task) {
 }
 
 void TaskManager::deleteTask(int id) {
-    for (auto it = tasks.begin(); it != tasks.end(); ++it) {
-        if (it->getId() == id) {
-            tasks.erase(it);
-            return; // 删除后直接退出，避免迭代器失效
-        }
+    auto it = std::find_if(tasks.begin(), tasks.end(),
+                           [id](const Task& task) { return task.getId() == id; });
+    if (it != tasks.end()) {
+        tasks.erase(it);
+        std::cout << "Task with ID " << id << " deleted successfully." << std::endl;
+    } else {
+        throw std::runtime_error("Task with ID " + std::to_string(id) + " not found.");
     }
-    std::cerr << "Error: Task with ID " << id << " not found." << std::endl;
+}
+
+void TaskManager::editTask(int id, const Task& updatedTask) {
+    auto it = std::find_if(tasks.begin(), tasks.end(),
+                           [id](const Task& task) { return task.getId() == id; });
+    if (it != tasks.end()) {
+        // 保持原有的ID，更新其他属性
+        it->setName(updatedTask.getName());
+        it->setStartTime(updatedTask.getStartTime());
+        it->setReminderTime(updatedTask.getReminderTime());
+        it->setCategory(updatedTask.getCategory());
+        it->setPriority(updatedTask.getPriority());
+        it->setDone(updatedTask.isDone());
+        std::cout << "Task with ID " << id << " updated successfully." << std::endl;
+    } else {
+        throw std::runtime_error("Task with ID " + std::to_string(id) + " not found.");
+    }
+}
+
+void TaskManager::finishTask(int id) {
+    auto it = std::find_if(tasks.begin(), tasks.end(),
+                           [id](const Task& task) { return task.getId() == id; });
+    if (it != tasks.end()) {
+        it->setDone(true);
+        std::cout << "Task with ID " << id << " marked as completed." << std::endl;
+    } else {
+        throw std::runtime_error("Task with ID " + std::to_string(id) + " not found.");
+    }
+}
+
+Task* TaskManager::findTaskById(int id) {
+    auto it = std::find_if(tasks.begin(), tasks.end(),
+                           [id](const Task& task) { return task.getId() == id; });
+    return (it != tasks.end()) ? &(*it) : nullptr;
 }
 
 std::vector<Task> TaskManager::getTasksByDate(const std::string& date) const {
@@ -90,6 +125,14 @@ bool TaskManager::loadFromFile(const std::string& filename) {
             std::string priority = line.substr(priority_pos + 12, reminder_time_pos - (priority_pos + 12));
             
             std::string reminder_time = line.substr(reminder_time_pos + 17);
+            
+            // 检查是否有完成状态标记
+            bool isDone = false;
+            size_t completed_pos = reminder_time.find(" [COMPLETED]");
+            if (completed_pos != std::string::npos) {
+                isDone = true;
+                reminder_time = reminder_time.substr(0, completed_pos);
+            }
 
             // 去除字符串前后的空格
             name = trim(name);
@@ -98,7 +141,9 @@ bool TaskManager::loadFromFile(const std::string& filename) {
             priority = trim(priority);
             reminder_time = trim(reminder_time);
 
-            tasks.emplace_back(id, name, start_time, category, priority, reminder_time);
+            Task task(id, name, start_time, category, priority, reminder_time);
+            task.setDone(isDone);
+            tasks.emplace_back(task);
         } catch (const std::exception& e) {
             std::cerr << "Error: Failed to parse task data in file: " << line << std::endl;
             continue; // 跳过错误数据

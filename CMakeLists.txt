@@ -21,6 +21,7 @@ set(SOURCES
     src/CommandLineInterface.cpp
     src/AddTaskDialog.cpp
     src/TaskListDialog.cpp
+    src/EditTaskDialog.cpp
     src/TaskManager.cpp
     src/User.cpp
     src/Task.cpp
@@ -33,6 +34,7 @@ set(HEADERS
     include/CommandLineInterface.h
     include/AddTaskDialog.h
     include/TaskListDialog.h
+    include/EditTaskDialog.h
     include/TaskManager.h
     include/User.h
     include/Task.h

@@ -19,6 +19,15 @@ public:
     std::string getCategory() const;
     std::string getPriority() const;
     std::string getReminderTime() const;
+    bool isDone() const;
+    
+    // 添加 setter 方法
+    void setName(const std::string& name);
+    void setStartTime(const std::string& start_time);
+    void setCategory(const std::string& category);
+    void setPriority(const std::string& priority);
+    void setReminderTime(const std::string& reminder_time);
+    void setDone(bool done);
 
 private:
     int id;
@@ -27,6 +36,7 @@ private:
     std::string category;
     std::string priority;
     std::string reminder_time;
+    bool done = false;
 };
 
 #endif // TASK_H

@@ -9,6 +9,9 @@ class TaskManager {
 public:
     void addTask(const Task& task);
     void deleteTask(int id);
+    void editTask(int id, const Task& updatedTask);
+    void finishTask(int id);
+    Task* findTaskById(int id);
     std::vector<Task> getTasksByDate(const std::string& date) const;
     std::vector<Task> getAllTasks() const; // 新增方法
     void saveToFile(const std::string& filename) const;

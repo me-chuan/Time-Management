@@ -17,6 +17,9 @@ std::string Task::toString() const {
     oss << "ID: " << id << ", Name: " << name << ", Start Time: " << start_time
         << ", Category: " << category << ", Priority: " << priority
         << ", Reminder Time: " << reminder_time;
+    if (done) {
+        oss << " [COMPLETED]";
+    }
     return oss.str();
 }
 
@@ -43,4 +46,33 @@ std::string Task::getPriority() const {
 
 std::string Task::getReminderTime() const {
     return reminder_time;
+}
+
+bool Task::isDone() const {
+    return done;
+}
+
+// 添加 setter 方法的实现
+void Task::setName(const std::string& name) {
+    this->name = name;
+}
+
+void Task::setStartTime(const std::string& start_time) {
+    this->start_time = start_time;
+}
+
+void Task::setCategory(const std::string& category) {
+    this->category = category;
+}
+
+void Task::setPriority(const std::string& priority) {
+    this->priority = priority;
+}
+
+void Task::setReminderTime(const std::string& reminder_time) {
+    this->reminder_time = reminder_time;
+}
+
+void Task::setDone(bool done) {
+    this->done = done;
 }

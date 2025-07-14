@@ -8,7 +8,7 @@
 #include <QApplication>  // 添加Qt应用程序支持
 #include <QTextCodec>  // 添加这个头文件
 #include <QFont>  // 添加这个头文件来支持QFont
-#include <QInputMethod>  // 添加这个
+#include <QInputMethod>  
 
 const std::string USER_FILE = "../data/users.txt";
 
@@ -47,6 +47,11 @@ std::map<std::string, User> loadUsersFromFile() {
 }
 
 int main(int argc, char* argv[]) {  // 修改main函数签名以支持Qt
+
+    // 在创建QApplication之前设置属性
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+
     // 初始化Qt应用程序
     QApplication app(argc, argv);
 
@@ -62,9 +67,6 @@ int main(int argc, char* argv[]) {  // 修改main函数签名以支持Qt
     // 用户管理
     std::map<std::string, User> users = loadUsersFromFile();
     std::cout << "Welcome to the Schedule Management System!" << std::endl;
-
-    // 启用输入法支持
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     while (true) {
         std::cout << "Please choose an option: [register/login/deleteuser/exit]: ";

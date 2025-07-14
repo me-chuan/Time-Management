@@ -5,6 +5,7 @@
 #include <QApplication>
 #include "AddTaskDialog.h"
 #include "TaskListDialog.h"
+#include "EditTaskDialog.h"
 
 CommandLineInterface::CommandLineInterface(TaskManager& taskManager, Scheduler& scheduler)
     : taskManager(taskManager), scheduler(scheduler) {}
@@ -15,6 +16,10 @@ void CommandLineInterface::showHelp() const {
               << "    - Opens a graphical dialog to add a new task\n"
               << "  deltask <id>\n"
               << "    - id: Task ID to delete\n"
+              << "  edittask <id>\n"
+              << "    - id: Task ID to edit (opens graphical dialog)\n"
+              << "  finish <id>\n"
+              << "    - id: Task ID to mark as completed\n"
               << "  showtask\n"
               << "    - Opens a graphical dialog to display all tasks with sorting options\n"
               << "    - Supports sorting by ID, start time, and reminder time\n"
@@ -87,6 +92,66 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
             }
         } catch (const std::exception& e) {
             std::cerr << "Error deleting task: " << e.what() << std::endl;
+        }
+    } else if (command == "edittask" && args.size() == 2) {
+        try {
+            int id = std::stoi(args[1]);
+            Task* task = taskManager.findTaskById(id);
+            if (task) {
+                EditTaskDialog dialog(*task);
+                if (dialog.exec() == QDialog::Accepted) {
+                    std::string name = dialog.getTaskName();
+                    std::string start_time = dialog.getStartTime();
+                    std::string reminder_time = dialog.getReminderTime();
+                    std::string category = dialog.getCategory();
+                    std::string priority = dialog.getPriority();
+                    bool isDone = dialog.getIsDone();
+
+                    // 如果用户没有输入分类或优先级，使用默认值
+                    if (category.empty()) {
+                        category = "未分类";
+                    }
+                    if (priority.empty()) {
+                        priority = "中";
+                    }
+
+                    try {
+                        if (name.empty()) {
+                            throw std::invalid_argument("Task name cannot be empty.");
+                        }
+                        if (!isValidTimeFormat(start_time)) {
+                            throw std::invalid_argument("Invalid start time format. Expected format: YYYY-MM-DD_HH:MM.");
+                        }
+                        if (!isValidTimeFormat(reminder_time)) {
+                            throw std::invalid_argument("Invalid reminder time format. Expected format: YYYY-MM-DD_HH:MM.");
+                        }
+
+                        // 创建更新的任务
+                        Task updatedTask(id, name, start_time, category, priority, reminder_time);
+                        updatedTask.setDone(isDone);
+                        taskManager.editTask(id, updatedTask);
+                        taskManager.saveToFile("../data/tasks.txt");
+                        std::cout << "Task with ID " << id << " updated and saved to file." << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cerr << "Error updating task: " << e.what() << std::endl;
+                    }
+                } else {
+                    std::cout << "Task editing cancelled." << std::endl;
+                }
+            } else {
+                std::cerr << "Task with ID " << id << " not found." << std::endl;
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error editing task: " << e.what() << std::endl;
+        }
+    } else if (command == "finish" && args.size() == 2) {
+        try {
+            int id = std::stoi(args[1]);
+            taskManager.finishTask(id);
+            taskManager.saveToFile("../data/tasks.txt");
+            std::cout << "Task with ID " << id << " marked as completed and saved to file." << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "Error finishing task: " << e.what() << std::endl;
         }
     } else if (command == "showtask") {
         auto tasks = taskManager.getAllTasks();

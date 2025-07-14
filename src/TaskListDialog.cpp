@@ -40,7 +40,7 @@ void TaskListDialog::setupUI() {
     
     // 任务表格
     taskTable = new QTableWidget(this);
-    taskTable->setColumnCount(6);
+    taskTable->setColumnCount(7);
     
     QStringList headers;
     headers << QString::fromUtf8("ID") 
@@ -48,7 +48,8 @@ void TaskListDialog::setupUI() {
             << QString::fromUtf8("开始时间") 
             << QString::fromUtf8("分类") 
             << QString::fromUtf8("优先级") 
-            << QString::fromUtf8("提醒时间");
+            << QString::fromUtf8("提醒时间")
+            << QString::fromUtf8("状态");
     taskTable->setHorizontalHeaderLabels(headers);
     
     // 设置表格属性
@@ -105,19 +106,27 @@ void TaskListDialog::populateTable(const std::vector<Task>& tasks) {
         QTableWidgetItem* reminderTimeItem = new QTableWidgetItem(QString::fromUtf8(task.getReminderTime().c_str()));
         taskTable->setItem(i, 5, reminderTimeItem);
         
-        // 根据优先级设置行颜色
+        // 状态
+        QTableWidgetItem* statusItem = new QTableWidgetItem(
+            task.isDone() ? QString::fromUtf8("已完成") : QString::fromUtf8("未完成")
+        );
+        taskTable->setItem(i, 6, statusItem);
+        
+        // 根据优先级和完成状态设置行颜色
         QColor rowColor;
-        if (task.getPriority() == "高" || task.getPriority() == "High") {
-            rowColor = QColor(255, 200, 200); // 浅红色
+        if (task.isDone()) {
+            rowColor = QColor(200, 255, 200); // 已完成：浅绿色
+        } else if (task.getPriority() == "高" || task.getPriority() == "High") {
+            rowColor = QColor(255, 200, 200); // 高优先级：浅红色
         } else if (task.getPriority() == "中" || task.getPriority() == "Middle") {
-            rowColor = QColor(255, 255, 200); // 浅黄色
+            rowColor = QColor(255, 255, 200); // 中优先级：浅黄色
         } else if (task.getPriority() == "低" || task.getPriority() == "Low") {
-            rowColor = QColor(200, 255, 200); // 浅绿色
+            rowColor = QColor(220, 220, 255); // 低优先级：浅蓝色
         } else {
             rowColor = QColor(240, 240, 240); // 默认灰色
         }
         
-        for (int j = 0; j < 6; ++j) {
+        for (int j = 0; j < 7; ++j) {
             taskTable->item(i, j)->setBackground(rowColor);
         }
     }
