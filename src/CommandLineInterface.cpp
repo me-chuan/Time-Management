@@ -4,22 +4,20 @@
 #include  "Utils.h"
 #include <QApplication>
 #include "AddTaskDialog.h"
+#include "TaskListDialog.h"
 
 CommandLineInterface::CommandLineInterface(TaskManager& taskManager, Scheduler& scheduler)
     : taskManager(taskManager), scheduler(scheduler) {}
 
 void CommandLineInterface::showHelp() const {
     std::cout << "Available commands:\n"
-              << "  addtask <name> <start_time> <reminder_time> [-c <category>] [-p <priority>]\n"
-              << "    - name: Task name (non-empty string)\n"
-              << "    - start_time: Task start time (format: YYYY-MM-DD_HH:MM)\n"
-              << "    - reminder_time: Task reminder time (format: YYYY-MM-DD_HH:MM)\n"
-              << "    - -c <category>: Optional task category (default: 未分类)\n"
-              << "    - -p <priority>: Optional task priority (default: 中)\n"
+              << "  addtask\n"
+              << "    - Opens a graphical dialog to add a new task\n"
               << "  deltask <id>\n"
               << "    - id: Task ID to delete\n"
               << "  showtask\n"
-              << "    - Display all tasks\n"
+              << "    - Opens a graphical dialog to display all tasks with sorting options\n"
+              << "    - Supports sorting by ID, start time, and reminder time\n"
               << "  run\n"
               << "    - Start the reminder thread\n"
               << "  help\n"
@@ -47,10 +45,10 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
 
             // 如果用户没有输入分类或优先级，使用默认值
             if (category.empty()) {
-                category = "未分类";
+                category = "None";
             }
             if (priority.empty()) {
-                priority = "中";
+                priority = "Middle";
             }
 
             try {
@@ -92,8 +90,12 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
         }
     } else if (command == "showtask") {
         auto tasks = taskManager.getAllTasks();
-        for (const auto& task : tasks) {
-            std::cout << task.toString() << std::endl;
+        if (tasks.empty()) {
+            std::cout << "No tasks available." << std::endl;
+        } else {
+            // 显示图形界面任务列表
+            TaskListDialog dialog(tasks);
+            dialog.exec();
         }
     } else if (command == "run") {
         scheduler.startReminderThread();

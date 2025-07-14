@@ -42,15 +42,15 @@ AddTaskDialog::AddTaskDialog(QWidget* parent)
     layout->addWidget(reminderTimeInput);
 
     // Category
-    layout->addWidget(new QLabel(QString::fromUtf8("分类 (可选, 默认: 未分类):"), this));
+    layout->addWidget(new QLabel(QString::fromUtf8("分类 (可选, 默认: None):"), this));
     categoryInput = new QLineEdit(this);
-    categoryInput->setPlaceholderText(QString::fromUtf8("学习, 工作, 生活, 健康, 娱乐"));
+    categoryInput->setPlaceholderText(QString::fromUtf8("Study, Work, Life, Health, Entertainment"));
     layout->addWidget(categoryInput);
 
     // Priority
-    layout->addWidget(new QLabel(QString::fromUtf8("优先级 (可选, 默认: 中):"), this));
+    layout->addWidget(new QLabel(QString::fromUtf8("优先级 (可选, 默认: Middle):"), this));
     priorityInput = new QLineEdit(this);
-    priorityInput->setPlaceholderText(QString::fromUtf8("高, 中, 低"));
+    priorityInput->setPlaceholderText(QString::fromUtf8("High, Middle, Low"));
     layout->addWidget(priorityInput);
 
     // Buttons

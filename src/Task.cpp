@@ -20,6 +20,7 @@ std::string Task::toString() const {
     return oss.str();
 }
 
+// 添加 getter 方法的实现
 int Task::getId() const {
     return id;
 }
@@ -30,6 +31,14 @@ std::string Task::getName() const {
 
 std::string Task::getStartTime() const {
     return start_time;
+}
+
+std::string Task::getCategory() const {
+    return category;
+}
+
+std::string Task::getPriority() const {
+    return priority;
 }
 
 std::string Task::getReminderTime() const {

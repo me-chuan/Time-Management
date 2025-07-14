@@ -12,9 +12,12 @@ public:
     bool isValid() const;
     std::string toString() const;
 
+    // 添加 getter 方法
     int getId() const;
     std::string getName() const;
     std::string getStartTime() const;
+    std::string getCategory() const;
+    std::string getPriority() const;
     std::string getReminderTime() const;
 
 private:
