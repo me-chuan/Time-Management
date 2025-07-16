@@ -12,7 +12,7 @@
 
 const std::string USER_FILE = "../data/users.txt";
 
-// 保存用户数据到文件
+// 修改保存用户数据到文件的逻辑
 void saveUsersToFile(const std::map<std::string, User>& users) {
     std::ofstream file(USER_FILE);
     if (!file.is_open()) {
@@ -21,12 +21,13 @@ void saveUsersToFile(const std::map<std::string, User>& users) {
     }
 
     for (const auto& [username, user] : users) {
-        file << username << " " << user.getPasswordHash() << std::endl;
+        file << username << "," << user.getPasswordHash() << std::endl;
     }
 
     file.close();
 }
 
+// 修改加载用户数据的逻辑
 std::map<std::string, User> loadUsersFromFile() {
     std::map<std::string, User> users;
     std::ifstream file(USER_FILE);
@@ -35,14 +36,17 @@ std::map<std::string, User> loadUsersFromFile() {
         return users;
     }
 
-    std::string username, passwordHash;
-    while (file >> username >> passwordHash) {
-        // 使用特殊构造函数加载用户，直接保存哈希值
-        users[username] = User(username, passwordHash, true); // 第三个参数表示密码已经是哈希值
+    std::string line;
+    while (std::getline(file, line)) {
+        size_t delimiterPos = line.find(',');
+        if (delimiterPos != std::string::npos) {
+            std::string username = line.substr(0, delimiterPos);
+            std::string passwordHash = line.substr(delimiterPos + 1);
+            users[username] = User(username, passwordHash, true);
+        }
     }
 
     file.close();
-    //std::cout << "Total users loaded: " << users.size() << std::endl;
     return users;
 }
 
@@ -76,11 +80,15 @@ int main(int argc, char* argv[]) {  // 修改main函数签名以支持Qt
         if (option == "register") {
             std::string username, password;
             std::cout << "Enter username: ";
-            std::cin >> username;
+            std::cin.ignore(); // 清除输入缓冲区
+            std::getline(std::cin, username); // 使用getline读取整行输入
             std::cout << "Enter password: ";
-            std::cin >> password;
+            std::getline(std::cin, password); // 使用getline读取整行输入
 
-            if (users.find(username) != users.end()) {
+            // 检查用户名和密码是否为空
+            if (username.empty() || password.empty()) {
+                std::cout << "Error: Username and password cannot be empty!" << std::endl;
+            } else if (users.find(username) != users.end()) {
                 std::cout << "Error: Username already exists!" << std::endl;
             } else {
                 users[username] = User(username, password);
@@ -90,31 +98,38 @@ int main(int argc, char* argv[]) {  // 修改main函数签名以支持Qt
         } else if (option == "login") {
             std::string username, password;
             std::cout << "Enter username: ";
-            std::cin >> username;
+            std::cin.ignore(); // 清除输入缓冲区
+            std::getline(std::cin, username); // 使用getline读取整行输入
             std::cout << "Enter password: ";
-            std::cin >> password;
+            std::getline(std::cin, password); // 使用getline读取整行输入
 
-            auto it = users.find(username);
-            if (it != users.end() && it->second.authenticate(username, password)) {
-                std::cout << "Login successful!" << std::endl;
-
-                // 创建 TaskManager 实例
-                TaskManager taskManager;
-
-                // 创建 Scheduler 实例
-                Scheduler scheduler(taskManager);
-
-                // 创建 CommandLineInterface 实例
-                CommandLineInterface cli(taskManager, scheduler);
-
-                // 进入命令行交互模式
-                cli.runShellMode();
-
-                return 0; // 退出程序
+            // 检查用户名和密码是否为空
+            if (username.empty() || password.empty()) {
+                std::cout << "Error: Username and password cannot be empty!" << std::endl;
             } else {
-                std::cout << "Error: Invalid username or password!" << std::endl;
-            }
-        } else if (option == "delete") {
+                auto it = users.find(username);
+                if (it != users.end() && it->second.authenticate(username, password)) {
+                    std::cout << "Login successful!" << std::endl;
+
+                    // 创建 TaskManager 实例
+                    TaskManager taskManager;
+
+                    // 创建 Scheduler 实例
+                    Scheduler scheduler(taskManager);
+
+                    // 创建 CommandLineInterface 实例
+                    CommandLineInterface cli(taskManager, scheduler);
+
+                    // 进入命令行交互模式
+                    cli.runShellMode();
+
+                    return 0; // 退出程序
+                } else {
+                    std::cout << "Error: Invalid username or password!" << std::endl;
+                }
+        } 
+        }
+        else if (option == "delete") {
             std::string username, password;
             std::cout << "Enter username: ";
             std::cin >> username;
