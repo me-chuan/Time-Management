@@ -25,6 +25,8 @@ void CommandLineInterface::showHelp() const {
               << "    - Supports sorting by ID, start time, and reminder time\n"
               << "  run\n"
               << "    - Start the reminder thread\n"
+              << "  stop\n"
+              << "    - Stop the reminder thread\n"
               << "  help\n"
               << "    - Show this help message\n"
               << "  exit\n"
@@ -164,6 +166,9 @@ void CommandLineInterface::handleCommand(const std::vector<std::string>& args) {
         }
     } else if (command == "run") {
         scheduler.startReminderThread();
+    } else if (command == "stop") {
+        scheduler.stopReminderThread();
+        std::cout << "Reminder thread stopped." << std::endl;
     } else if (command == "help") {
         showHelp();
     } else if (command == "exit") {
