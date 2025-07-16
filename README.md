@@ -57,7 +57,7 @@ FINAL/
 
 3. **运行程序**：
    ```bash
-   ./ScheduleManagementSystem
+   ./myschedule
    ```
 
 ## 使用说明
